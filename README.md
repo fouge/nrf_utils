@@ -45,4 +45,4 @@ $ python gen_version.py -f path/to/version.ini -i path/to/version.h" -p
 $ python gen_version.py -f path/to/version.ini -i path/to/version.h" -m
 ```
 
-...Note: In order to go further, you must ensure that a build is uniquely identified, [follow that article from Memfault for more information](https://interrupt.memfault.com/blog/gnu-build-id-for-firmware).
+...Note: In order to go further, you must ensure that a build is uniquely identified, [read that article from Memfault for more information](https://interrupt.memfault.com/blog/gnu-build-id-for-firmware).
