@@ -32,12 +32,15 @@ class colors:
     FATAL = RED
     WARNING = YELLOW
 
-if len(sys.argv) != 3:
+if len(sys.argv) < 2:
     print("Usage: {} <port> <path-to-elf-file>".format(sys.argv[0]))
     quit()
 
 port = sys.argv[1]
-path_to_elf = sys.argv[2]
+path_to_elf = ""
+if len(sys.argv) >= 3:
+    path_to_elf = sys.argv[2]
+
 ser = Serial(port, 1000000)
 
 log_parse_re = re.compile(r'\[(\d+):(\d+):(\d):(.+?):(\d+)\] (.*)')
@@ -97,7 +100,7 @@ while 1:
     # When crash is detected
     # Crash dump is added into a temp file
     # GDB is used to back trace the crash
-    if b"###CRASH###" in line.strip():
+    if b"###CRASH###" in line.strip() and len(path_to_elf) > 0:
         print("Crash detected, retrieving crash info...")
         dump_filename = "last_crash_dump.txt"
         dump_file = open(dump_filename, 'wb+')
