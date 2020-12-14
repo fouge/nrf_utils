@@ -135,7 +135,7 @@ def main(argv):
     header_file.write( "\n")
     header_file.write( "#endif\n")
 
-    print("\033[32mVersion set to {}.{}.{}\033[0m".format(firmware_major, firmware_minor, firmware_patch))
+    print("Version set to {}.{}.{} / bl:{} / hw:{}".format(firmware_major, firmware_minor, firmware_patch, bl_version, hw_rev))
 
 if __name__ == '__main__':
     main(sys.argv[1:])
