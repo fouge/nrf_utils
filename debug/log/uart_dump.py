@@ -130,4 +130,10 @@ while 1:
 
     now = datetime.datetime.now()
 
+    to_print = ""
+    try:
+        to_print = line.decode('utf-8').rstrip()
+    except Exception as err:
+        print("ERROR: {}".format(err))
+
     print(log_parse_re.sub(parse_message, line.decode('utf-8').rstrip()))
