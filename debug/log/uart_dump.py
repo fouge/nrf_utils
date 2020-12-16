@@ -136,4 +136,4 @@ while 1:
     except Exception as err:
         print("ERROR: {}".format(err))
 
-    print(log_parse_re.sub(parse_message, line.decode('utf-8').rstrip()))
+    print(log_parse_re.sub(parse_message, to_print))
