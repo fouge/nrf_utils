@@ -1,4 +1,5 @@
-#!/usr/bin/env python -u
+#!/usr/bin/env python
+import getopt
 
 from serial import Serial
 import re
@@ -10,6 +11,7 @@ import subprocess
 
 if sys.version_info[0] < 3:
     raise Exception("Python 3 or a more recent version is required.")
+
 
 class colors:
     END = '\033[0m'
@@ -32,19 +34,92 @@ class colors:
     FATAL = RED
     WARNING = YELLOW
 
-if len(sys.argv) < 2:
-    print("Usage: {} <port> <path-to-elf-file>".format(sys.argv[0]))
-    quit()
-
-port = sys.argv[1]
-path_to_elf = ""
-if len(sys.argv) >= 3:
-    path_to_elf = sys.argv[2]
-
-ser = Serial(port, 1000000)
 
 log_parse_re = re.compile(r'\[(\d+):(\d+):(\d):(.+?):(\d+)\] (.*)')
 timestamp_re = re.compile(r'\d{10}')
+
+global now
+
+
+def main(argv):
+    baud_rate = 1000000
+    path_to_elf = ""
+    port = ""
+    help = "Usage: {} -p <port> [-e <path-to-elf-file>] [-b <baud_rate>]\nDefault baud rate: 1000000".format(
+        sys.argv[0])
+
+    if len(sys.argv) < 2:
+        print(help)
+        quit()
+
+    try:
+        opts, args = getopt.getopt(argv[1:], "p:e:b:h", ["port="])
+
+        if opts != None:
+            for opt, arg in opts:
+                if opt == '-h':
+                    print(help)
+                    sys.exit()
+                elif opt in "-p":
+                    port = arg
+                elif opt in "-e":
+                    path_to_elf = arg
+                elif opt in "-b":
+                    baud_rate = int(arg)
+    except getopt.GetoptError:
+        print(help)
+
+    if port == "":
+        print("Please provide a port to listen to.")
+        print(help)
+        exit(0)
+
+    print("Listening UART (8N1 {}) on {}".format(baud_rate, port))
+    ser = Serial(port, baud_rate)
+
+    while 1:
+        line = ser.readline()
+        if not line:
+            break
+
+        # When crash is detected
+        # Crash dump is added into a temp file
+        # GDB is used to back trace the crash
+        if b"###CRASH###" in line.strip() and len(path_to_elf) > 0:
+            print("Crash detected, retrieving crash info...")
+            dump_filename = "last_crash_dump.txt"
+            dump_file = open(dump_filename, 'wb+')
+            crashdebug_exe = "../CrashDebug/lin64/CrashDebug"
+            if platform.system() == "Darwin":
+                crashdebug_exe = "../CrashDebug/osx64/CrashDebug"
+
+            cmd = "arm-none-eabi-gdb --batch --quiet " + path_to_elf + "  -ex \"set target-charset ASCII\" -ex \"target remote | " + crashdebug_exe + " --elf " + path_to_elf + " --dump " + dump_filename + "\" -ex \"set print pretty on\" -ex \"bt full\" -ex \"quit\""
+            print(cmd)
+
+            line = ser.readline()
+            while b"###END###" not in line.strip():
+                dump_file.write(line)
+                line = ser.readline()
+
+            print("Crash info retrieved.\n")
+
+            dump_file.close()
+
+            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            output, error = process.communicate()
+
+            print(output.decode("utf-8"))
+            print("---------\n")
+            line = b""
+
+        to_print = ""
+        try:
+            to_print = line.decode('utf-8').rstrip()
+        except Exception as err:
+            print("ERROR: {}".format(err))
+
+        print(log_parse_re.sub(parse_message, to_print))
+
 
 def insert_delta(matchobj):
     if len(matchobj.group(0)) == 10:
@@ -58,7 +133,10 @@ def insert_delta(matchobj):
 
         return colors.BLUE + "%010i " % (ts) + colors.BOLD + "%s" % delta + colors.END
 
+
 def parse_message(matchobj):
+    now = datetime.datetime.now()
+
     local_time = "%s" % (now.isoformat(' ')[:23]) + colors.END
     remote_time = colors.BLUE + timestamp_re.sub(insert_delta, matchobj.group(1)) + colors.END
 
@@ -66,11 +144,10 @@ def parse_message(matchobj):
     file = colors.CYAN + matchobj.group(4) + colors.END
     line = colors.MAGENTA + matchobj.group(5) + colors.END
 
-
     load = matchobj.group(2)
-    if (int(load) > 5):
+    if int(load) > 5:
         load = colors.RED + load + colors.END
-    elif (int(load) > 2):
+    elif int(load) > 2:
         load = colors.YELLOW + load + colors.END
     else:
         load = colors.WHITE + load + colors.END
@@ -83,7 +160,7 @@ def parse_message(matchobj):
         color = colors.YELLOW
     elif level == '3':
         color = colors.RED
-    elif level  == '4':
+    elif level == '4':
         color = colors.RED + colors.BOLD
     else:
         color = colors.END
@@ -92,48 +169,6 @@ def parse_message(matchobj):
 
     return local_time + " [" + remote_time + ":" + load + ":" + file + ":" + line + "] " + message
 
-while 1:
-    line = ser.readline()
-    if not line:
-        break
 
-    # When crash is detected
-    # Crash dump is added into a temp file
-    # GDB is used to back trace the crash
-    if b"###CRASH###" in line.strip() and len(path_to_elf) > 0:
-        print("Crash detected, retrieving crash info...")
-        dump_filename = "last_crash_dump.txt"
-        dump_file = open(dump_filename, 'wb+')
-        crashdebug_exe = "../CrashDebug/lin64/CrashDebug"
-        if platform.system() == "Darwin":
-            crashdebug_exe = "../CrashDebug/osx64/CrashDebug"
-
-        cmd = "arm-none-eabi-gdb --batch --quiet " + path_to_elf + "  -ex \"set target-charset ASCII\" -ex \"target remote | " + crashdebug_exe + " --elf " + path_to_elf + " --dump " + dump_filename + "\" -ex \"set print pretty on\" -ex \"bt full\" -ex \"quit\""
-        print(cmd)
-
-        line = ser.readline()
-        dumping = True
-        while b"###END###" not in line.strip():
-            dump_file.write(line)
-            line = ser.readline()
-
-        print("Crash info retrieved.\n")
-
-        dump_file.close()
-
-        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-        output, error = process.communicate()
-
-        print(output.decode("utf-8"))
-        print("---------\n")
-        line = b""
-
-    now = datetime.datetime.now()
-
-    to_print = ""
-    try:
-        to_print = line.decode('utf-8').rstrip()
-    except Exception as err:
-        print("ERROR: {}".format(err))
-
-    print(log_parse_re.sub(parse_message, to_print))
+if __name__ == '__main__':
+    main(sys.argv)
