@@ -10,7 +10,7 @@ import subprocess
 
 def main(argv):
     opts = None
-    help = "\033[33m-v <major.minor.patch>\033[0m"
+    help = "\033[33mHelp:\npython gen_version.py -i path/to/version.h [-f path/to/version.ini | -v <major.minor.patch>] [-m] [-p]\n-f -v\teither provide ini [f]ile or manually enter the [v]ersion\n-m\tincrement minor\n-p\tincrement patch\033[0m"
     app_version = ''
     path_version_h = ''
     path_version_ini = ''
@@ -69,9 +69,7 @@ def main(argv):
             firmware_patch = str(int(firmware_patch) + 1 )
 
         if not increment_minor and not increment_patch:
-            print("Nothing to be done.")
-            print(help)
-            sys.exit(0)
+            print("Version not changed in ini file.")
 
     else:
         # Parse app version
@@ -85,30 +83,39 @@ def main(argv):
             print("ERROR: Version must match the pattern major.minor.patch")
             sys.exit(0)
 
-    ini_file = open(path_version_ini, 'w')
-    print("Writing new version {}.{}.{} into version.ini".format(firmware_major, firmware_minor, firmware_patch))
-    #write major, minor, patch and bl version to version.ini
-    ini_file.writelines("[version]" + "\nmajor=" + firmware_major + "\nminor=" + firmware_minor + "\npatch=" + firmware_patch + "\nbl=" + bl_version + "\nhw=" + hw_rev)
-    ini_file.close()
+    if increment_minor or increment_patch:
+        ini_file = open(path_version_ini, 'w')
+        print(
+            "Writing version into {}: {}.{}.{} / bl:{} / hw:{}".format(path_version_ini, firmware_major, firmware_minor,
+                                                                       firmware_patch, bl_version, hw_rev))
+        # write major, minor, patch and bl version to version.ini
+        ini_file.writelines(
+            "[version]" + "\nmajor=" + firmware_major + "\nminor=" + firmware_minor + "\npatch=" + firmware_patch + "\nbl=" + bl_version + "\nhw=" + hw_rev)
+        ini_file.close()
+
     if path_version_h == '' and (increment_patch or increment_minor):
         print("Job done without generating a new version.h file (path missing)")
         sys.exit(0)
 
     if path_version_h == '':
         print("ERROR: version.h path is missing")
+        print(help);
         sys.exit()
     else:
         header_file = open(path_version_h, 'w')
 
-    #update version.h
+    print("Writing version into {}: {}.{}.{} / bl:{} / hw:{}".format(path_version_h, firmware_major, firmware_minor,
+                                                                     firmware_patch, bl_version, hw_rev))
+
+    # update version.h
     header_file.seek(0)
 
-    header_file.write( "#ifndef VERSION_H__\n")
-    header_file.write( "#define VERSION_H__\n")
-    header_file.write( "\n")
-    header_file.write( "/* clang-format off */")
-    header_file.write( "\n")
-    proc=subprocess.Popen('git rev-parse --abbrev-ref HEAD', shell=True, stdout=subprocess.PIPE, )
+    header_file.write("#ifndef VERSION_H__\n")
+    header_file.write("#define VERSION_H__\n")
+    header_file.write("\n")
+    header_file.write("/* clang-format off */")
+    header_file.write("\n")
+    proc = subprocess.Popen('git rev-parse --abbrev-ref HEAD', shell=True, stdout=subprocess.PIPE, )
     build=proc.communicate()[0]
     branch_len = len(build.rstrip())
     header_file.write( "#define     FIRMWARE_BRANCH_NAME_SIZE   {}\n".format(str(branch_len)))
@@ -135,7 +142,6 @@ def main(argv):
     header_file.write( "\n")
     header_file.write( "#endif\n")
 
-    print("Version set to {}.{}.{} / bl:{} / hw:{}".format(firmware_major, firmware_minor, firmware_patch, bl_version, hw_rev))
 
 if __name__ == '__main__':
     main(sys.argv[1:])
