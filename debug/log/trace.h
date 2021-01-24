@@ -30,7 +30,7 @@
 #define LOG_VERBOSE(...)                                       \
     do                                                         \
     {                                                          \
-        printf("[%010" PRIu32 ":", (uint32_t)time_get_time()); \
+        printf("[%010" PRIu32 ":", (uint32_t)time_get_time_epoch_epoch()); \
         printf("%u:", app_sched_queue_utilization_get());      \
         printf(L_VERBOSE);                                     \
         printf(":%s:%d] ", __FILE__, __LINE__);                \
@@ -41,7 +41,7 @@
 #define LOG_INFO(...)                                          \
     do                                                         \
     {                                                          \
-        printf("[%010" PRIu32 ":", (uint32_t)time_get_time()); \
+        printf("[%010" PRIu32 ":", (uint32_t)time_get_time_epoch()); \
         printf("%u:", app_sched_queue_utilization_get());      \
         printf(L_INFO);                                        \
         printf(":%s:%d] ", __FILE__, __LINE__);                \
@@ -52,7 +52,7 @@
 #define LOG_WARN(...)                                          \
     do                                                         \
     {                                                          \
-        printf("[%010" PRIu32 ":", (uint32_t)time_get_time()); \
+        printf("[%010" PRIu32 ":", (uint32_t)time_get_time_epoch()); \
         printf("%u:", app_sched_queue_utilization_get());      \
         printf(L_WARNING);                                     \
         printf(":%s:%d] ", __FILE__, __LINE__);                \
@@ -63,7 +63,7 @@
 #define LOG_ERROR(...)                                         \
     do                                                         \
     {                                                          \
-        printf("[%010" PRIu32 ":", (uint32_t)time_get_time()); \
+        printf("[%010" PRIu32 ":", (uint32_t)time_get_time_epoch()); \
         printf("%u:", app_sched_queue_utilization_get());      \
         printf(L_ERROR);                                       \
         printf(":%s:%d] ", __FILE__, __LINE__);                \
@@ -74,7 +74,7 @@
 #define LOG_FATAL(...)                                    \
     do                                                    \
     {                                                     \
-        printf("[%010" PRIu32 ":", time_get_time());      \
+        printf("[%010" PRIu32 ":", time_get_time_epoch());      \
         printf("%u:", app_sched_queue_utilization_get()); \
         printf(L_FATAL);                                  \
         printf(":%s:%d] ", __FILE__, (int)__LINE__);      \
