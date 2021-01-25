@@ -15,15 +15,22 @@ Use CMake to enjoy the power of CLion.
 
 ### Format
 
-I'm a big fan of clang-format. You'll find my customized formating file in [code/format/.clang-format](code/format/.clang-format). That file can be used directly in your editor. More info [here](https://clang.llvm.org/docs/ClangFormat.html).
+I'm a big fan of clang-format. You'll find my customized formating file
+in [code/format/.clang-format](code/format/.clang-format). That file can be used directly in your editor. More
+info [here](https://clang.llvm.org/docs/ClangFormat.html).
 
 You won't have any excuse for bad formating!
 
 ### Version
 
-[SemVer](https://semver.org/) is a great way to define how versions are handled into your project. That how I'm used to track versions for the Application.
+👉 Check-out [my article](http://www.cyrilfougeray.com/2021/01/25/recipe-automated-versioning.html) explaining the role
+of each file and how to setup an automated process for versioning.
 
-Versioning is better when automated. I've been using a file called `version.ini`, located at the root of the project containing both the Application and the Bootloader to track version in that manner: 
+[SemVer](https://semver.org/) is a great way to define how versions are handled into your project. That how I'm used to
+track versions for the Application.
+
+Versioning is better when automated. I've been using a file called `version.ini`, located at the root of the project
+containing both the Application and the Bootloader to track version in that manner:
 
 	* `Major.Minor.Patch`, same as SemVer, for Application version.
 		* `Major` increased between each major version that are not backward compatible for the end user: API update, new bootloader breaking stuff between the two versions, new SoftDevice or SDK version for example.
@@ -32,7 +39,8 @@ Versioning is better when automated. I've been using a file called `version.ini`
 	* `Version`, using one number, for Bootloader version.
 	* `Version`, using one number, for Hardware version.
 
-I setup a script to write that version into `version.ini`, and two `version.h` files for both your Application and Bootloader projects.
+I've setup a script to write that version into `version.ini`, and two `version.h` files for both your Application and
+Bootloader projects.
 
 ```
 # Setup version = 1.2.3
