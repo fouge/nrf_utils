@@ -39,13 +39,14 @@ log_parse_re = re.compile(r'\[(\d+):(\d+):(\d):(.+?):(\d+)\] (.*)')
 timestamp_re = re.compile(r'\d{10}')
 
 global now
-
+print_full = False
 
 def main(argv):
     baud_rate = 1000000
     path_to_elf = ""
     port = ""
-    help = "Usage: {} -p <port> [-e <path-to-elf-file>] [-b <baud_rate>]\nDefault baud rate: 1000000".format(
+    global print_full
+    help = "Usage: {} -p <port> [-e <path-to-elf-file>] [-b <baud_rate>] [--full]\nDefault baud rate: 1000000\nFull flag provides full date, delta time between target and host, full file path".format(
         sys.argv[0])
 
     if len(sys.argv) < 2:
@@ -53,19 +54,21 @@ def main(argv):
         quit()
 
     try:
-        opts, args = getopt.getopt(argv[1:], "p:e:b:h", ["port="])
+        opts, args = getopt.getopt(argv[1:], "p:e:b:h", ["port=", "full"])
 
         if opts != None:
             for opt, arg in opts:
                 if opt == '-h':
                     print(help)
                     sys.exit()
-                elif opt in "-p":
+                elif opt in ("-p", "--port"):
                     port = arg
                 elif opt in "-e":
                     path_to_elf = arg
                 elif opt in "-b":
                     baud_rate = int(arg)
+                elif opt in "--full":
+                    print_full = True
     except getopt.GetoptError:
         print(help)
 
@@ -131,17 +134,26 @@ def insert_delta(matchobj):
         else:
             delta = ("(%.3fs)" % (delta))
 
-        return colors.BLUE + "%010i " % (ts) + colors.BOLD + "%s" % delta + colors.END
+        if not print_full:
+            delta = ""
+
+        return colors.BLUE + "%010i" % (ts) + colors.BOLD + "%s" % delta + colors.END
 
 
 def parse_message(matchobj):
     now = datetime.datetime.now()
 
-    local_time = "%s" % (now.isoformat(' ')[:23]) + colors.END
+    time_str = (now.isoformat(' ')[:23])
+    if not print_full:
+        time_str = time_str.split(' ')[1]
+    local_time = "%s" % time_str + colors.END
     remote_time = colors.BLUE + timestamp_re.sub(insert_delta, matchobj.group(1)) + colors.END
 
     level = matchobj.group(3)
-    file = colors.CYAN + matchobj.group(4) + colors.END
+    filename = matchobj.group(4)
+    if not print_full:
+        filename = filename.replace('../', '')
+    file = colors.CYAN + filename + colors.END
     line = colors.MAGENTA + matchobj.group(5) + colors.END
 
     load = matchobj.group(2)
