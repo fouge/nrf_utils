@@ -1,0 +1,12 @@
+name: nrf5
+channels:
+  - memfault
+  - conda-forge
+  - defaults
+dependencies:
+  - make=4.2.1
+  - gcc-arm-none-eabi=8.2019.q3.update
+  - python=3.8
+  - pip
+  - pip:
+      - -r requirements.txt
