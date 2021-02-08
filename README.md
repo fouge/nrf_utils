@@ -1,11 +1,21 @@
 # nrf_utils
 
-This repo is providing various tools and utilitaries to: 
+This repo is providing various tools and utilities to: 
 * `code`: manage Firmware through code formating, easy version handling and other tools for compilation
 * `debug`: Make Firmware debugging fast and accessible 
 * `deploy`: Make CI/CD and deployment easier
 
-Note: Python scripts are compatible with Python 3.7.
+Note: Python scripts are compatible with Python 3.7+.
+
+## Installation and usage
+
+### Conda
+
+A Conda environment file is provided: 
+
+```shell
+conda env create -f environment.yml
+```
 
 ## Code
 
