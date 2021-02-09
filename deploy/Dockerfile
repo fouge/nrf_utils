@@ -16,6 +16,7 @@ ENV PATH $PATH:/home/dev/gcc-arm-none-eabi-10-2020-q4-major/bin
 
 RUN pip3 install --upgrade pip
 RUN pip3 install nrfutil --user
+RUN PATH $PATH:/root/.local/bin
 
 WORKDIR /home/project
 
