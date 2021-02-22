@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import getopt
+import queue
 
 from serial import Serial
 import re
@@ -8,6 +9,7 @@ import time
 import sys
 import platform
 import subprocess
+from threading import Thread
 
 if sys.version_info[0] < 3:
     raise Exception("Python 3 or a more recent version is required.")
@@ -40,6 +42,15 @@ timestamp_re = re.compile(r'\d{10}')
 
 global now
 print_full = False
+
+def user_input(ser):
+    print("🧑‍💻 You can type commands")
+    while 1:
+        c = input()
+        try:
+            ser.write(c.encode('utf-8'))
+        except Exception as err:
+            print(err)
 
 def main(argv):
     baud_rate = 1000000
@@ -77,8 +88,10 @@ def main(argv):
         print(help)
         exit(0)
 
-    print("Listening UART (8N1 {}) on {}".format(baud_rate, port))
+    print("🎧 Listening UART (8N1 {}) on {}".format(baud_rate, port))
     ser = Serial(port, baud_rate)
+
+    Thread(target = user_input, args=[ser]).start()
 
     while 1:
         line = ser.readline()
