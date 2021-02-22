@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import getopt
-import queue
 
 from serial import Serial
 import re
