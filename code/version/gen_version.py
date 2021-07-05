@@ -90,7 +90,7 @@ def main(argv):
                                                                        firmware_patch, bl_version, hw_rev))
         # write major, minor, patch and bl version to version.ini
         ini_file.writelines(
-            "[version]" + "\nmajor=" + firmware_major + "\nminor=" + firmware_minor + "\npatch=" + firmware_patch + "\nbl=" + bl_version + "\nhw=" + hw_rev)
+            "[version]" + "\nmajor=" + firmware_major + "\nminor=" + firmware_minor + "\npatch=" + firmware_patch + "\nbl=" + bl_version + "\nhw=" + hw_rev + "\n")
         ini_file.close()
 
     if path_version_h == '' and (increment_patch or increment_minor):
@@ -99,7 +99,7 @@ def main(argv):
 
     if path_version_h == '':
         print("ERROR: version.h path is missing")
-        print(help);
+        print(help)
         sys.exit()
     else:
         header_file = open(path_version_h, 'w')
