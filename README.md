@@ -21,7 +21,7 @@ conda env create -f environment.yml
 
 ### CMake
 
-Use CMake to enjoy the power of CLion.
+CMake makes compilation faster and CLion has a great support which makes a great build system generator.
 
 ### Format
 
