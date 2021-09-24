@@ -36,10 +36,3 @@ function(generate_object target suffix type)
             COMMENT "Building ${target}${suffix}"
             )
 endfunction()
-
-function(add_flash_target target elf_file)
-    add_custom_target(flash_${target}
-            nrfjprog -f nrf52 --program ${elf_file} --sectorerase
-            DEPENDS ${target}
-    )
-endfunction()
