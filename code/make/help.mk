@@ -9,8 +9,11 @@
 # To shift help sentences, set TARGET_MAX_CHAR_NUM before including this file
 
 # COLORS
+BOLD  := $(shell tput bold)
+RED  := $(shell tput -Txterm setaf 1)
 GREEN  := $(shell tput -Txterm setaf 2)
 YELLOW := $(shell tput -Txterm setaf 3)
+BLUE := $(shell tput -Txterm setaf 4)
 WHITE  := $(shell tput -Txterm setaf 7)
 RESET  := $(shell tput -Txterm sgr0)
 
