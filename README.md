@@ -1,8 +1,9 @@
 # nrf_utils
 
-This repo is providing various tools and utilities to: 
-* `code`: manage Firmware through code formating, easy version handling and other tools for compilation
-* `debug`: Make Firmware debugging fast and accessible 
+This repo is providing various tools and utilities to:
+
+* `code`: manage Firmware through code formatting, easy version handling and other tools for compilation
+* `debug`: Make Firmware debugging fast and accessible
 * `deploy`: Make CI/CD and deployment easier
 
 Note: Python scripts are compatible with Python 3.7+.
@@ -11,7 +12,7 @@ Note: Python scripts are compatible with Python 3.7+.
 
 ### Conda
 
-A Conda environment file is provided: 
+A Conda environment file is provided:
 
 ```shell
 conda env create -f environment.yml
@@ -25,19 +26,21 @@ CMake makes compilation faster and CLion has a great support which makes a great
 
 ### Format
 
-I'm a big fan of clang-format. You'll find my customized formating file
+I'm a big fan of clang-format. You'll find my customized formatting file
 in [code/format/.clang-format](code/format/.clang-format). That file can be used directly in your editor. More
 info [here](https://clang.llvm.org/docs/ClangFormat.html).
 
-You won't have any excuse for bad formating!
+To perform checks and format committed files, you can easily install a pre-commit hook
+using [`pre-commit`](https://pre-commit.com/). A pre-commit configuration file is
+available [here](code/format/pre-commit-config.yaml).
 
 ### Version
 
 👉 Check-out [my article](http://www.cyrilfougeray.com/2021/01/25/recipe-automated-versioning.html) explaining the role
-of each file and how to setup an automated process for versioning.
+of each file and how to set up an automated process for versioning.
 
 [SemVer](https://semver.org/) is a great way to define how versions are handled into your project. That how I'm used to
-track versions for the Application.
+tracking versions for the Application.
 
 Versioning is better when automated. I've been using a file called `version.ini`, located at the root of the project
 containing both the Application and the Bootloader to track version in that manner:
@@ -49,7 +52,7 @@ containing both the Application and the Bootloader to track version in that mann
 	* `Version`, using one number, for Bootloader version.
 	* `Version`, using one number, for Hardware version.
 
-I've setup a script to write that version into `version.ini`, and two `version.h` files for both your Application and
+I've set up a script to write that version into `version.ini`, and two `version.h` files for both your Application and
 Bootloader projects.
 
 ```
@@ -63,10 +66,16 @@ $ python gen_version.py -f path/to/version.ini -i path/to/version.h" -p
 $ python gen_version.py -f path/to/version.ini -i path/to/version.h" -m
 ```
 
-...Note: In order to go further, you must ensure that a build is uniquely identified, [read that article from Memfault for more information](https://interrupt.memfault.com/blog/gnu-build-id-for-firmware).
+...Note: In order to go further, you must ensure that a build is uniquely
+identified, [read that article from Memfault for more information](https://interrupt.memfault.com/blog/gnu-build-id-for-firmware)
+.
 
 ## Debug
 
-Checkout [my article](https://www.cyrilfougeray.com/2020/07/27/firmware-logs-with-stack-trace.html) explaining how to implement the debugging tools.
+Checkout [my article](https://www.cyrilfougeray.com/2020/07/27/firmware-logs-with-stack-trace.html) explaining how to
+implement the debugging tools.
 
-You will find a log generator ([target side](debug/log/trace.h)) and parser ([Python client](debug/log/uart_dump.py)) to make your logs beautiful and convenient. You will also be able to print stack trace directly from the client if you implement [CrashCatcher](https://github.com/adamgreen/CrashCatcher) on your target. You can use [crash_hexdump.c](debug/log/crash_hexdump.c) as an example to implement CrashCatcher. 
+You will find a log generator ([target side](debug/log/trace.h)) and parser ([Python client](debug/log/uart_dump.py)) to
+make your logs beautiful and convenient. You will also be able to print stack trace directly from the client if you
+implement [CrashCatcher](https://github.com/adamgreen/CrashCatcher) on your target. You can
+use [crash_hexdump.c](debug/log/crash_hexdump.c) as an example to implement CrashCatcher. 
